@@ -1,0 +1,28 @@
+name: Release PR
+
+on:
+  issue_comment:
+    types: [created]
+
+env:
+
+permissions:
+  contents: read
+
+jobs:
+  release-pr:
+    if: github.repository == 'esoubiran-aneo/test-requrest-action' && github.event.issue.pull_request && github.event.comment.body == '/trigger release'
+    permissions:
+      id-token: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Ensure action is by maintainer
+        uses: octokit/request-action@89697eb6635e52c6e1e5559f15b5c91ba5100cb0 # v2.1.9
+        id: check_role
+        with:
+          route: GET /repos/esoubiran-aneo/test-requrest-action/collaborators/${{ github.event.comment.user.login }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
